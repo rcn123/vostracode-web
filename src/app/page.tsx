@@ -6,6 +6,13 @@ import { type SanityDocument } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import { client } from "@/sanity/client";
 
+type Post = SanityDocument & {
+  title: string;
+  slug: { current: string };
+  publishedAt: string;
+  body?: any;
+};
+
 const POSTS_QUERY = `*[
   _type == "post"
   && defined(slug.current)
@@ -121,8 +128,7 @@ function PricingCard({ tier }: { tier: (typeof tiers)[number] }) {
 }
 
 function FeatureItem({
-  description,
-  disabled = false,
+  description, 
 }: {
   description: string
   disabled?: boolean
@@ -147,7 +153,7 @@ function PlusIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   )
 }
 
-function PostsSection({ posts }: { posts: SanityDocument[] }) {
+function PostsSection({ posts }: { posts: Post[] }) {
   return (
     <div className="py-8">
       <Container>
@@ -159,6 +165,11 @@ function PostsSection({ posts }: { posts: SanityDocument[] }) {
             {posts.map((post) => (
               <li key={post._id}>
                 <strong>{post.title}</strong> - {new Date(post.publishedAt).toLocaleDateString()}
+                {post.body && (
+                  <div className="text-sm text-gray-600 mt-1">
+                    <PortableText value={post.body as any} />
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -169,7 +180,7 @@ function PostsSection({ posts }: { posts: SanityDocument[] }) {
 }
 
 export default async function Home() {
-  const posts = await client.fetch<SanityDocument[]>(POSTS_QUERY, {}, options);
+  const posts = await client.fetch<Post[]>(POSTS_QUERY, {}, options);
   
   return (
     <main className="min-h-screen">

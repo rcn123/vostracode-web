@@ -1,13 +1,16 @@
 'use client'
 
 import { clsx } from 'clsx'
+import Image from 'next/image'
 
 export function Logo({ className }: { className?: string }) {
   return (
     <div className={clsx(className, 'flex items-center gap-3 pr-4')}>
-      <img
+      <Image
         src="/vostra-code-logo.svg"
         alt="VostraCode"
+        width={56}
+        height={56}
         className="h-14 w-auto"
       />
       <span className="text-xl font-bold text-gray-950">VostraCode</span>
@@ -17,9 +20,11 @@ export function Logo({ className }: { className?: string }) {
 
 export function Mark({ className }: { className?: string }) {
   return (
-    <img
+    <Image
       src="/vostra-code-logo.svg"
       alt="VostraCode"
+      width={32}
+      height={32}
       className={className}
     />
   )
