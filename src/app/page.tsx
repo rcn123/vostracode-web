@@ -10,7 +10,8 @@ type Post = SanityDocument & {
   title: string;
   slug: { current: string };
   publishedAt: string;
-  body?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body?: any; // PortableText requires this to be any
 };
 
 const POSTS_QUERY = `*[
@@ -167,7 +168,7 @@ function PostsSection({ posts }: { posts: Post[] }) {
                 <strong>{post.title}</strong> - {new Date(post.publishedAt).toLocaleDateString()}
                 {post.body && (
                   <div className="text-sm text-gray-600 mt-1">
-                    <PortableText value={post.body as any} />
+                    <PortableText value={post.body} />
                   </div>
                 )}
               </li>
