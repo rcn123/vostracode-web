@@ -7,7 +7,7 @@ export function Logo({ className }: { className?: string }) {
   return (
     <div className={clsx(className, 'flex items-center gap-3 pr-4')}>
       <Image
-        src="/vostra-code-logo.svg"
+        src="/vostracode-logo.svg"
         alt="VostraCode"
         width={56}
         height={56}
@@ -21,7 +21,7 @@ export function Logo({ className }: { className?: string }) {
 export function Mark({ className }: { className?: string }) {
   return (
     <Image
-      src="/vostra-code-logo.svg"
+      src="/vostracode-logo.svg"
       alt="VostraCode"
       width={32}
       height={32}
