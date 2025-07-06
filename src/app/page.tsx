@@ -22,7 +22,8 @@ type StartPage = SanityDocument & {
   tierCards?: unknown[];
 };
 
-type TierFeatureSection = SanityDocument & {
+type TierFeatureGroup = SanityDocument & {
+  order: number;
   title: string;
   tierFeatures?: Array<{
     title: string;
@@ -42,8 +43,9 @@ const STARTPAGE_QUERY = `*[_type == "startPage"][0]{
   tierCards[]->
 }`;
 
-const TIER_FEATURE_SECTION_QUERY = `*[_type == "tierFeatureSection"]{
+const TIER_FEATURE_GROUP_QUERY = `*[_type == "tierFeatureGroup"]|order(order asc){
   _id,
+  order,
   title,
   tierFeatures[]{
     title,
@@ -230,8 +232,8 @@ function PlusIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
   )
 }
 
-function FeatureTable({ tierFeatureSections, startPage }: { tierFeatureSections: TierFeatureSection[]; startPage: StartPage }) {
-  if (!tierFeatureSections || !Array.isArray(tierFeatureSections) || tierFeatureSections.length === 0) {
+function FeatureTable({ tierFeatureGroups, startPage }: { tierFeatureGroups: TierFeatureGroup[]; startPage: StartPage }) {
+  if (!tierFeatureGroups || !Array.isArray(tierFeatureGroups) || tierFeatureGroups.length === 0) {
     return null;
   }
 
@@ -246,17 +248,17 @@ function FeatureTable({ tierFeatureSections, startPage }: { tierFeatureSections:
     return values.split(';').map(v => v.trim());
   }
 
-  // Prepare grouped features by section
-  const groupedSections = tierFeatureSections.map(section => ({
-    sectionTitle: section.title,
-    features: (section.tierFeatures || []).map(feature => ({
+  // Prepare grouped features by group
+  const groupedGroups = tierFeatureGroups.map(group => ({
+    groupTitle: group.title,
+    features: (group.tierFeatures || []).map(feature => ({
       featureTitle: feature.title,
       values: parseValues(typeof feature.values === 'string' ? feature.values : ''),
     })),
   }));
 
   // If no features at all, return null
-  if (groupedSections.every(section => section.features.length === 0)) {
+  if (groupedGroups.every(group => group.features.length === 0)) {
     return null;
   }
 
@@ -287,16 +289,16 @@ function FeatureTable({ tierFeatureSections, startPage }: { tierFeatureSections:
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {groupedSections.map((section, sectionIdx) => (
-                  <React.Fragment key={section.sectionTitle || sectionIdx}>
-                    {/* Section header row */}
+                {groupedGroups.map((group, groupIdx) => (
+                  <React.Fragment key={group.groupTitle || groupIdx}>
+                    {/* Group header row */}
                     <tr>
                       <th colSpan={tierNames.length + 1} className="bg-gray-50 px-6 py-4 text-left text-base font-semibold text-gray-900">
-                        {section.sectionTitle}
+                        {group.groupTitle}
                       </th>
                     </tr>
                     {/* Feature rows */}
-                    {section.features.map((feature, featureIndex) => (
+                    {group.features.map((feature, featureIndex) => (
                       <tr key={feature.featureTitle || featureIndex}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {feature.featureTitle}
@@ -327,12 +329,12 @@ function FeatureTable({ tierFeatureSections, startPage }: { tierFeatureSections:
         {/* Mobile view (ungrouped, for simplicity) */}
         <div className="lg:hidden">
           <div className="space-y-8">
-            {groupedSections.map((section, sectionIdx) => (
-              <div key={section.sectionTitle || sectionIdx}>
+            {groupedGroups.map((group, groupIdx) => (
+              <div key={group.groupTitle || groupIdx}>
                 <div className="text-base font-semibold text-gray-900 bg-gray-50 rounded-t-lg px-4 py-2 mb-2">
-                  {section.sectionTitle}
+                  {group.groupTitle}
                 </div>
-                {section.features.map((feature, featureIndex) => (
+                {group.features.map((feature, featureIndex) => (
                   <div key={feature.featureTitle || featureIndex} className="bg-gray-50 rounded-b-lg p-6 mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">{feature.featureTitle}</h3>
                     <div className="space-y-3">
@@ -365,7 +367,7 @@ function FeatureTable({ tierFeatureSections, startPage }: { tierFeatureSections:
 
 export default async function Home() { 
   const startPage = await client.fetch<StartPage>(STARTPAGE_QUERY, {}, options);
-  const tierFeatureSections = await client.fetch<TierFeatureSection[]>(TIER_FEATURE_SECTION_QUERY, {}, options);
+  const tierFeatureGroups = await client.fetch<TierFeatureGroup[]>(TIER_FEATURE_GROUP_QUERY, {}, options);
   
   return (
     <main className="min-h-screen">
@@ -373,7 +375,7 @@ export default async function Home() {
       <ProductOverview startPage={startPage} />
       <HowItWorks startPage={startPage} /> 
       <TierCards startPage={startPage} />
-      <FeatureTable tierFeatureSections={tierFeatureSections} startPage={startPage} />
+      <FeatureTable tierFeatureGroups={tierFeatureGroups} startPage={startPage} />
     </main>
   )
 }
