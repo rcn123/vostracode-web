@@ -6,6 +6,8 @@ import { type SanityDocument } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import { client } from "@/sanity/client";
 import Image from "next/image";
+import { CheckIcon, MinusIcon } from '@heroicons/react/20/solid';
+import React from "react"; // Added missing import for React
 
 // Post type removed since it's no longer used
 
@@ -19,6 +21,14 @@ type StartPage = SanityDocument & {
   howItWorks?: unknown[]; // PortableText requires this to be any
   tierCards?: unknown[];
 };
+
+type TierFeatureSection = SanityDocument & {
+  title: string;
+  tierFeatures?: Array<{
+    title: string;
+    values: string;
+  }>;
+};
  
 const STARTPAGE_QUERY = `*[_type == "startPage"][0]{
   _id,
@@ -30,6 +40,15 @@ const STARTPAGE_QUERY = `*[_type == "startPage"][0]{
   howItWorksTitle,
   howItWorks,
   tierCards[]->
+}`;
+
+const TIER_FEATURE_SECTION_QUERY = `*[_type == "tierFeatureSection"]{
+  _id,
+  title,
+  tierFeatures[]{
+    title,
+    values
+  }
 }`;
 
 const options = { next: { revalidate: 30 } };
@@ -111,7 +130,7 @@ function ProductOverview({ startPage }: { startPage: StartPage }) {
         <div className="-mt-12 -ml-12 p-12 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:overflow-hidden">
           <Image
             alt="VostraCode Product Screenshot"
-            src="https://tailwindcss.com/plus-assets/img/component-images/dark-project-app-screenshot.png"
+            src="/dark-project-app-screenshot.png"
             width={800}
             height={600}
             className="w-3xl max-w-none rounded-xl bg-gray-900 shadow-xl ring-1 ring-gray-400/10 sm:w-228"
@@ -210,10 +229,143 @@ function PlusIcon(props: React.ComponentPropsWithoutRef<'svg'>) {
     </svg>
   )
 }
+
+function FeatureTable({ tierFeatureSections, startPage }: { tierFeatureSections: TierFeatureSection[]; startPage: StartPage }) {
+  if (!tierFeatureSections || !Array.isArray(tierFeatureSections) || tierFeatureSections.length === 0) {
+    return null;
+  }
+
+  // Get tier names from the tierCards data
+  const tierNames = startPage.tierCards?.map((tier: unknown, index: number) => {
+    const tierData = tier as { header?: string };
+    return tierData.header || `Tier ${index + 1}`;
+  }) || [];
+
+  // Helper to parse values string
+  function parseValues(values: string): string[] {
+    return values.split(';').map(v => v.trim());
+  }
+
+  // Prepare grouped features by section
+  const groupedSections = tierFeatureSections.map(section => ({
+    sectionTitle: section.title,
+    features: (section.tierFeatures || []).map(feature => ({
+      featureTitle: feature.title,
+      values: parseValues(typeof feature.values === 'string' ? feature.values : ''),
+    })),
+  }));
+
+  // If no features at all, return null
+  if (groupedSections.every(section => section.features.length === 0)) {
+    return null;
+  }
+
+  return (
+    <div className="bg-white py-24 sm:py-32">
+      <Container>
+        <div className="mx-auto max-w-4xl text-center mb-16">
+          <h2 className="text-base/7 font-semibold text-indigo-600">Feature Comparison</h2>
+          <p className="mt-2 text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl">
+            Complete Feature Overview
+          </p>
+        </div>
+
+        {/* Desktop view */}
+        <div className="hidden lg:block">
+          <div className="overflow-hidden rounded-lg border border-gray-200">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Feature
+                  </th>
+                  {tierNames.map((tierName, index) => (
+                    <th key={index} scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {tierName}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {groupedSections.map((section, sectionIdx) => (
+                  <React.Fragment key={section.sectionTitle || sectionIdx}>
+                    {/* Section header row */}
+                    <tr>
+                      <th colSpan={tierNames.length + 1} className="bg-gray-50 px-6 py-4 text-left text-base font-semibold text-gray-900">
+                        {section.sectionTitle}
+                      </th>
+                    </tr>
+                    {/* Feature rows */}
+                    {section.features.map((feature, featureIndex) => (
+                      <tr key={feature.featureTitle || featureIndex}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {feature.featureTitle}
+                        </td>
+                        {tierNames.map((_, valueIndex) => {
+                          const value = feature.values[valueIndex];
+                          return (
+                            <td key={valueIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+                              {value === 'true' ? (
+                                <CheckIcon className="h-5 w-5 text-green-600 mx-auto" />
+                              ) : value === 'false' ? (
+                                <MinusIcon className="h-5 w-5 text-gray-400 mx-auto" />
+                              ) : (
+                                <span>{value}</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Mobile view (ungrouped, for simplicity) */}
+        <div className="lg:hidden">
+          <div className="space-y-8">
+            {groupedSections.map((section, sectionIdx) => (
+              <div key={section.sectionTitle || sectionIdx}>
+                <div className="text-base font-semibold text-gray-900 bg-gray-50 rounded-t-lg px-4 py-2 mb-2">
+                  {section.sectionTitle}
+                </div>
+                {section.features.map((feature, featureIndex) => (
+                  <div key={feature.featureTitle || featureIndex} className="bg-gray-50 rounded-b-lg p-6 mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">{feature.featureTitle}</h3>
+                    <div className="space-y-3">
+                      {feature.values.map((value, valueIndex) => (
+                        <div key={valueIndex} className="flex justify-between items-center">
+                          <span className="text-sm font-medium text-gray-600">{tierNames[valueIndex] || `Tier ${valueIndex + 1}`}</span>
+                          <div className="text-sm text-gray-900">
+                            {value === 'true' ? (
+                              <CheckIcon className="h-5 w-5 text-green-600" />
+                            ) : value === 'false' ? (
+                              <MinusIcon className="h-5 w-5 text-gray-400" />
+                            ) : (
+                              <span>{value}</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </div>
+  );
+}
  
 
 export default async function Home() { 
   const startPage = await client.fetch<StartPage>(STARTPAGE_QUERY, {}, options);
+  const tierFeatureSections = await client.fetch<TierFeatureSection[]>(TIER_FEATURE_SECTION_QUERY, {}, options);
   
   return (
     <main className="min-h-screen">
@@ -221,6 +373,7 @@ export default async function Home() {
       <ProductOverview startPage={startPage} />
       <HowItWorks startPage={startPage} /> 
       <TierCards startPage={startPage} />
+      <FeatureTable tierFeatureSections={tierFeatureSections} startPage={startPage} />
     </main>
   )
 }
