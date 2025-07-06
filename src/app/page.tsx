@@ -5,24 +5,19 @@ import { Gradient } from "@/components/gradient";
 import { type SanityDocument } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import { client } from "@/sanity/client";
+import Image from "next/image";
 
-type Post = SanityDocument & {
-  title: string;
-  slug: { current: string };
-  publishedAt: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  body?: any; // PortableText requires this to be any
-};
+// Post type removed since it's no longer used
 
 type StartPage = SanityDocument & {
   logoTitle: string;
   title: string;
   subtitle: string;
   productOverviewTitle?: string;
-  productOverview?: any[];
+  productOverview?: unknown[]; // PortableText requires this to be any
   howItWorksTitle?: string;
-  howItWorks?: any[];
-  tierCards?: any[];
+  howItWorks?: unknown[]; // PortableText requires this to be any
+  tierCards?: unknown[];
 };
  
 const STARTPAGE_QUERY = `*[_type == "startPage"][0]{
@@ -66,7 +61,7 @@ function Hero({ startPage }: { startPage: StartPage }) {
 }
 
 function ProductOverview({ startPage }: { startPage: StartPage }) {
-  if (!startPage?.productOverview || startPage.productOverview.length === 0) {
+  if (!startPage?.productOverview || !Array.isArray(startPage.productOverview) || startPage.productOverview.length === 0) {
     return null;
   }
 
@@ -107,15 +102,18 @@ function ProductOverview({ startPage }: { startPage: StartPage }) {
                 {startPage.productOverviewTitle || 'Product Overview'}
               </h1>
               <div className="mt-6 text-base/7 text-gray-700">
-                <PortableText value={startPage.productOverview} />
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                <PortableText value={startPage.productOverview as any} />
               </div>
             </div>
           </div>
         </div>
         <div className="-mt-12 -ml-12 p-12 lg:sticky lg:top-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:overflow-hidden">
-          <img
+          <Image
             alt="VostraCode Product Screenshot"
             src="https://tailwindcss.com/plus-assets/img/component-images/dark-project-app-screenshot.png"
+            width={800}
+            height={600}
             className="w-3xl max-w-none rounded-xl bg-gray-900 shadow-xl ring-1 ring-gray-400/10 sm:w-228"
           />
         </div>
@@ -126,7 +124,7 @@ function ProductOverview({ startPage }: { startPage: StartPage }) {
 }
 
 function HowItWorks({ startPage }: { startPage: StartPage }) {
-  if (!startPage?.howItWorks || startPage.howItWorks.length === 0) {
+  if (!startPage?.howItWorks || !Array.isArray(startPage.howItWorks) || startPage.howItWorks.length === 0) {
     return null;
   }
 
@@ -138,7 +136,8 @@ function HowItWorks({ startPage }: { startPage: StartPage }) {
             {startPage.howItWorksTitle || 'How It Works'}
           </h2>
           <div className="prose prose-lg text-gray-950/75">
-            <PortableText value={startPage.howItWorks} />
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            <PortableText value={startPage.howItWorks as any} />
           </div>
         </div>
       </Container>
@@ -161,19 +160,21 @@ function TierCards({ startPage }: { startPage: StartPage }) {
   )
 }
 
-function TierCard({ tier }: { tier: any }) {
+function TierCard({ tier }: { tier: unknown }) {
+  const tierData = tier as { header?: string; subHeader?: string; features?: Array<{ text: string }> };
+  
   return (
     <div className="-m-2 grid grid-cols-1 rounded-4xl shadow-[inset_0_0_2px_1px_#ffffff4d] ring-1 ring-black/5 max-lg:mx-auto max-lg:w-full max-lg:max-w-md">
       <div className="grid grid-cols-1 rounded-4xl p-2 shadow-md shadow-black/5">
         <div className="rounded-3xl bg-white p-10 pb-9 shadow-2xl ring-1 ring-black/5">
-          <h3 className="text-xl font-semibold text-gray-950">{tier.header}</h3>
-          <p className="mt-2 text-sm/6 text-gray-950/75">{tier.subHeader}</p>
+          <h3 className="text-xl font-semibold text-gray-950">{tierData.header}</h3>
+          <p className="mt-2 text-sm/6 text-gray-950/75">{tierData.subHeader}</p>
           <div className="mt-8">
             <h3 className="text-sm/6 font-medium text-gray-950">
               Features
             </h3>
             <ul className="mt-3 space-y-3">
-              {tier.features?.map((feature: any, featureIndex: number) => (
+              {tierData.features?.map((feature, featureIndex: number) => (
                 <FeatureItem key={featureIndex} description={feature.text} />
               ))}
             </ul>
