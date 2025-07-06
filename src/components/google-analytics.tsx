@@ -4,7 +4,7 @@ import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, Suspense } from 'react'
 
-const GA_MEASUREMENT_ID = 'G-1ELCYSE80X'
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-1ELCYSE80X'
 
 function GoogleAnalyticsInner() {
   const pathname = usePathname()
