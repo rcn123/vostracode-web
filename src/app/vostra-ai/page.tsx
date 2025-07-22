@@ -161,13 +161,19 @@ function ProductSuite() {
     <Container className="mt-32">
       <div className="text-center mb-16">
         <Heading as="h2" className="mt-4 text-5xl lg:text-6xl">
-          Product Suite
+          Who are we?
         </Heading> 
-        <Lead className="mt-8 max-w-4xl mx-auto text-xl leading-relaxed">
-          Vostra is the Italian word for &ldquo;Your&rdquo; - and that&apos;s exactly what we believe AI should be. 
-          At Vostra AI, we build privacy-first AI tools for secure, on-prem environments. With no external dependencies, 
-          complete data sovereignty, and full control over deployment, your AI runs where it belongs — in your own infrastructure.
-        </Lead>
+        
+        <div className="mt-8 max-w-4xl mx-auto">
+          <blockquote className="text-2xl font-semibold text-gray-400 mb-6 italic">
+            Vostra is the Italian word for 'Your' - Your Data. Your Control. Your AI.
+          </blockquote>
+          
+          <Lead className="text-xl leading-relaxed">
+            At Vostra AI, we build privacy-first AI tools for secure, on-prem environments. With no external dependencies, 
+            complete data sovereignty, and full control over deployment, your AI runs where it belongs — in your own infrastructure.
+          </Lead>
+        </div>
 
         <Lead className="mt-8 max-w-3xl mx-auto text-xl">
           VostraCode is just the beginning — the first release in a growing suite of on-prem AI tools designed to boost productivity, 
