@@ -1,0 +1,25 @@
+{
+  "name": "VostraCode - AI Coding Assistant",
+  "short_name": "VostraCode",
+  "description": "AI-powered coding assistant built security-first for on-premise deployment",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["developer", "productivity"],
+  "lang": "en",
+  "dir": "ltr"
+} 

@@ -1,0 +1,36 @@
+VostraCode
+
+VostraCode is an AI-powered coding assistant that helps developers write, refactor, and understand code directly inside their existing development tools. It provides real-time completions, code explanations, and suggestions — without sending any code or data externally.
+
+
+
+Premium features include support for multi-file operations and reasoning, a command-line interface for batch operations, and an automated code reviewer that integrates into your CI/CD pipeline.
+
+
+----
+
+VostraSentinel
+
+A set of tools for improving support and production insight. Includes:
+
+A support chat assistant for First Line Support and interactive users manual. The AI combines users input with internal application data, such as logs and system information. Primarily it tries to help the user immediately, but if necessary it will create a bug ticket with full context.
+
+ 
+
+ 
+
+Roadmap features: self-healing, rollback for containerized environments, early anomaly detection), Root cause tracing
+
+
+-----
+VostraGPT
+
+A private, self-hosted chat assistant. Supports working with documents outside of the chat and local reasoning. Used for drafting policies, reports, and internal documents or just the next after work.
+
+Add-ons and future modules:
+
+
+
+VostraCarta: Adds the ability to ask questions about internal documentation (e.g., Outline pages), using RAG-style document search.
+
+VostraColab: Collaboration-focused layer for writing and maintaining documentation with AI help. Anchored chat threads, versioning, and organization-aware context. Aimed at environments with structured documentation processes.
