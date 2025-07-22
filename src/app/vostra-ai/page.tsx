@@ -166,7 +166,7 @@ function ProductSuite() {
         
         <div className="mt-8 max-w-4xl mx-auto">
           <blockquote className="text-2xl font-semibold text-gray-400 mb-6 italic">
-            Vostra is the Italian word for 'Your' - Your Data. Your Control. Your AI.
+            Vostra is the Italian word for &apos;Your&apos; - Your Data. Your Control. Your AI.
           </blockquote>
           
           <Lead className="text-xl leading-relaxed">
