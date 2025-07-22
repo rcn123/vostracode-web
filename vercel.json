@@ -1,0 +1,27 @@
+{
+    "redirects": [
+      {
+        "source": "/",
+        "has": [
+          {
+            "type": "host",
+            "value": "vostra.ai"
+          }
+        ],
+        "destination": "https://vostracode.ai/vostra-ai",
+        "statusCode": 307
+      },
+      {
+        "source": "/",
+        "has": [
+          {
+            "type": "host",
+            "value": "www.vostra.ai"
+          }
+        ],
+        "destination": "https://vostracode.ai/vostra-ai",
+        "statusCode": 307
+      }
+    ]
+  }
+  
